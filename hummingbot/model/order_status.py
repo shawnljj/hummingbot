@@ -5,7 +5,7 @@ from typing import (
 )
 from sqlalchemy import (
     Column,
-    Text,
+    String,
     Integer,
     BigInteger,
     ForeignKey,
@@ -23,9 +23,9 @@ class OrderStatus(HummingbotBase):
                       )
 
     id = Column(Integer, primary_key=True, nullable=False)
-    order_id = Column(Text, ForeignKey("Order.id"), nullable=False)
+    order_id = Column(String(255), ForeignKey("Order.id"), nullable=False)
     timestamp = Column(BigInteger, nullable=False)
-    status = Column(Text, nullable=False)
+    status = Column(String(255), nullable=False)
     order = relationship("Order", back_populates="status")
 
     def __repr__(self) -> str:

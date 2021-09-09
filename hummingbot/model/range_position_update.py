@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from sqlalchemy import (
     Column,
-    Text,
+    String,
     Index,
     BigInteger,
     Float,
@@ -18,13 +18,13 @@ class RangePositionUpdate(HummingbotBase):
                       )
 
     id = Column(Integer, primary_key=True, nullable=False)
-    hb_id = Column(Text, ForeignKey("RangePosition.hb_id"), nullable=False)
+    hb_id = Column(String(255), ForeignKey("RangePosition.hb_id"), nullable=False)
     timestamp = Column(BigInteger, nullable=False)
-    tx_hash = Column(Text, nullable=True)
-    token_id = Column(Text, nullable=False)
+    tx_hash = Column(String(255), nullable=True)
+    token_id = Column(String(255), nullable=False)
     base_amount = Column(Float, nullable=False)
     quote_amount = Column(Float, nullable=False)
-    status = Column(Text, nullable=False)
+    status = Column(String(255), nullable=False)
 
     def __repr__(self) -> str:
         return f"RangePositionUpdate(id={self.id}, hb_id='{self.hb_id}', " \

@@ -6,7 +6,7 @@ from typing import (
 )
 from sqlalchemy import (
     Column,
-    Text,
+    String,
     Index,
     BigInteger,
     Float,
@@ -28,10 +28,10 @@ class FundingPayment(HummingbotBase):
                       )
 
     timestamp = Column(BigInteger, primary_key=True, nullable=False)
-    config_file_path = Column(Text, nullable=False)
-    market = Column(Text, nullable=False)
+    config_file_path = Column(String(255), nullable=False)
+    market = Column(String(255), nullable=False)
     rate = Column(Float, nullable=False)
-    symbol = Column(Text, nullable=False)
+    symbol = Column(String(255), nullable=False)
     amount = Column(Float, nullable=False)
 
     def __repr__(self) -> str:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from sqlalchemy import (
     Column,
-    Text,
+    String,
     Index,
     BigInteger,
     Float
@@ -16,18 +16,18 @@ class RangePosition(HummingbotBase):
                       Index("rp_connector_trading_pair_timestamp_index",
                             "connector", "trading_pair", "creation_timestamp")
                       )
-    hb_id = Column(Text, primary_key=True, nullable=False)
-    config_file_path = Column(Text, nullable=False)
-    strategy = Column(Text, nullable=False)
-    tx_hash = Column(Text, nullable=True)
-    connector = Column(Text, nullable=False)
-    trading_pair = Column(Text, nullable=False)
-    fee_tier = Column(Text, nullable=False)
+    hb_id = Column(String(255), primary_key=True, nullable=False)
+    config_file_path = Column(String(255), nullable=False)
+    strategy = Column(String(255), nullable=False)
+    tx_hash = Column(String(255), nullable=True)
+    connector = Column(String(255), nullable=False)
+    trading_pair = Column(String(255), nullable=False)
+    fee_tier = Column(String(255), nullable=False)
     lower_price = Column(Float, nullable=False)
     upper_price = Column(Float, nullable=False)
     base_amount = Column(Float, nullable=False)
     quote_amount = Column(Float, nullable=False)
-    status = Column(Text, nullable=False)
+    status = Column(String(255), nullable=False)
     creation_timestamp = Column(BigInteger, nullable=False)
     last_update_timestamp = Column(BigInteger, nullable=False)
 
