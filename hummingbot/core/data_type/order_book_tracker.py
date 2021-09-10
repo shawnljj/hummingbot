@@ -3,6 +3,9 @@ import asyncio
 from abc import ABC
 from collections import deque
 from enum import Enum
+from hummingbot.model.dm_order_book_snapshot import OrderBookSnapshot
+
+from sqlalchemy.orm.session import Session
 import logging
 import pandas as pd
 import re
@@ -22,6 +25,7 @@ from .order_book_message import (
     OrderBookMessage,
 )
 from hummingbot.core.data_type.order_book_tracker_data_source import OrderBookTrackerDataSource
+from hummingbot.model.sql_connection_manager import SQLConnectionManager
 
 TRADING_PAIR_FILTER = re.compile(r"(BTC|ETH|USDT)$")
 
@@ -235,12 +239,47 @@ class OrderBookTracker(ABC):
                 if trading_pair not in self._tracking_message_queues:
                     continue
                 message_queue: asyncio.Queue = self._tracking_message_queues[trading_pair]
+
+                self.write_order_book_snapshot_to_db(ob_message, trading_pair)
                 await message_queue.put(ob_message)
             except asyncio.CancelledError:
                 raise
             except Exception:
                 self.logger().error("Unknown error. Retrying after 5 seconds.", exc_info=True)
                 await asyncio.sleep(5.0)
+
+    def write_order_book_snapshot_to_db(self, obmsg: "OrderBookMessage", tpair: str):
+        session: Session = self.session
+        for bid in obmsg.bids:
+            order_book_snapshot: OrderBookSnapshot = OrderBookSnapshot(
+                trading_pair = tpair,
+                timestamp = obmsg.timestamp,
+                exchange = obmsg.type,
+                price = bid.price,
+                amount = bid.amount,
+                update_id = bid.update_id,
+                is_bid = True)
+            session.add(order_book_snapshot)
+            print("[SHAWN] --- ", order_book_snapshot.__repr__())
+
+        print("[SHAWN] --- ASKS")
+        for ask in obmsg.asks:
+            order_book_snapshot: OrderBookSnapshot = OrderBookSnapshot(
+                trading_pair = tpair,
+                timestamp = obmsg.timestamp,
+                exchange = obmsg.type,
+                price = ask.price,
+                amount = ask.amount,
+                update_id = ask.update_id,
+                is_bid = False)
+            session.add(order_book_snapshot)
+            print("[SHAWN] --- ", order_book_snapshot.__repr__())
+        session.commit()
+
+    @property
+    def session(self) -> Session:
+        self.trade_fill_db = SQLConnectionManager.get_trade_fills_instance(db_name="dm")
+        return self.trade_fill_db.get_shared_session()
 
     async def _track_single_book(self, trading_pair: str):
         past_diffs_window: Deque[OrderBookMessage] = deque()
@@ -302,6 +341,8 @@ class OrderBookTracker(ABC):
                 ))
 
                 messages_accepted += 1
+
+                # self._print_all_order_books()
 
                 # Log some statistics.
                 now: float = time.time()
