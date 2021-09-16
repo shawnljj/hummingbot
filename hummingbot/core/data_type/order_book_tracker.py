@@ -248,6 +248,7 @@ class OrderBookTracker(ABC):
                 self.logger().error("Unknown error. Retrying after 5 seconds.", exc_info=True)
                 await asyncio.sleep(5.0)
 
+    # TODO: ASYNC
     def write_order_book_snapshot_to_db(self, obmsg: "OrderBookMessage", tpair: str):
         session: Session = self.session
         for bid in obmsg.bids:
@@ -262,7 +263,6 @@ class OrderBookTracker(ABC):
             session.add(order_book_snapshot)
             print("[SHAWN] --- ", order_book_snapshot.__repr__())
 
-        print("[SHAWN] --- ASKS")
         for ask in obmsg.asks:
             order_book_snapshot: OrderBookSnapshot = OrderBookSnapshot(
                 trading_pair = tpair,
