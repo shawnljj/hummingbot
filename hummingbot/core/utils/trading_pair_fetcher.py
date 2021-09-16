@@ -37,14 +37,21 @@ class TradingPairFetcher:
 
     async def fetch_all(self):
         for conn_setting in CONNECTOR_SETTINGS.values():
+            print("[SHAWN] --- Conn_setting: ", conn_setting)
             module_name = f"{conn_setting.base_name()}_connector" if conn_setting.type is ConnectorType.Connector \
                 else f"{conn_setting.base_name()}_api_order_book_data_source"
+            print("[SHAWN] --- module_name: ", module_name)
             module_path = f"hummingbot.connector.{conn_setting.type.name.lower()}." \
                           f"{conn_setting.base_name()}.{module_name}"
+            print("[SHAWN] --- module_path: ", module_path)
             class_name = "".join([o.capitalize() for o in conn_setting.base_name().split("_")]) + \
                          "APIOrderBookDataSource" if conn_setting.type is not ConnectorType.Connector \
                          else "".join([o.capitalize() for o in conn_setting.base_name().split("_")]) + "Connector"
+            print("[SHAWN] --- class_name: ", class_name)
+
             module = getattr(importlib.import_module(module_path), class_name)
+            print("[SHAWN] --- module: ", module)
+
             args = {}
             args = conn_setting.add_domain_parameter(args)
             safe_ensure_future(self.call_fetch_pairs(module.fetch_trading_pairs(**args), conn_setting.name))
@@ -54,6 +61,7 @@ class TradingPairFetcher:
     async def call_fetch_pairs(self, fetch_fn: Callable[[], Awaitable[List[str]]], exchange_name: str):
         try:
             self.trading_pairs[exchange_name] = await fetch_fn
+            print("[SHAWN] --- trading_pairs: ", self.trading_pairs[exchange_name])
         except Exception:
             self.logger().error(f"Connector {exchange_name} failed to retrieve its trading pairs. "
                                 f"Trading pairs autocompletion won't work.", exc_info=True)
