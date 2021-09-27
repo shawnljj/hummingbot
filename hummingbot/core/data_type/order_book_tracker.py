@@ -20,7 +20,7 @@ from hummingbot.core.event.events import OrderBookTradeEvent, TradeType
 from hummingbot.logger import HummingbotLogger
 from hummingbot.core.data_type.order_book import OrderBook
 from hummingbot.core.utils.async_utils import safe_ensure_future
-from .order_book_message import (
+from hummingbot.core.data_type.order_book_message import (
     OrderBookMessageType,
     OrderBookMessage,
 )
@@ -249,7 +249,7 @@ class OrderBookTracker(ABC):
                 await asyncio.sleep(5.0)
 
     # TODO: ASYNC
-    def write_order_book_snapshot_to_db(self, obmsg: "OrderBookMessage", tpair: str):
+    async def write_order_book_snapshot_to_db(self, obmsg: "OrderBookMessage", tpair: str):
         session: Session = self.session
         for bid in obmsg.bids:
             order_book_snapshot: OrderBookSnapshot = OrderBookSnapshot(
@@ -274,7 +274,7 @@ class OrderBookTracker(ABC):
                 is_bid = False)
             session.add(order_book_snapshot)
             print("[SHAWN] --- ", order_book_snapshot.__repr__())
-        session.commit()
+        await session.commit()
 
     @property
     def session(self) -> Session:

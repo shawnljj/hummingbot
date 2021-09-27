@@ -30,6 +30,7 @@ class OrderBookSnapshot(HummingbotBase):
     id = Column(Integer, primary_key=True)
     trading_pair = Column(String(20), nullable=False)
     timestamp = Column(BigInteger, nullable=False)
+    type = Column(String(50), nullable=False)
     exchange = Column(String(255), nullable=False)
     price = Column(Float, nullable=False)
     amount = Column(Float, nullable=False)
@@ -39,7 +40,7 @@ class OrderBookSnapshot(HummingbotBase):
     def __repr__(self) -> str:
         return f"OrderBookSnapshot(id={self.id}, trading_pair='{self.trading_pair}', timestamp='{self.timestamp}', " \
                f"exchange='{self.exchange}', price='{self.price}', amount='{self.amount}', " \
-               f"update_id='{self.update_id}', is_bid={self.is_bid}) "
+               f"update_id='{self.update_id}', is_bid={self.is_bid}, type={self.type}) "
 
     @staticmethod
     def to_bounty_api_json(orderBookSnapshot: "OrderBookSnapshot") -> Dict[str, Any]:
@@ -51,5 +52,6 @@ class OrderBookSnapshot(HummingbotBase):
             "price": numpy.format_float_positional(orderBookSnapshot.price),
             "amount": numpy.format_float_positional(orderBookSnapshot.amount),
             "update_id": orderBookSnapshot.update_id,
-            "is_bid": orderBookSnapshot.is_bid
+            "is_bid": orderBookSnapshot.is_bid,
+            "type": orderBookSnapshot.type
         }
